@@ -1,0 +1,199 @@
+/*
+ * @Author: pt13 
+ * @Date: 2023-12-23 21:38:40 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2023-12-23 22:28:15
+ */
+
+
+CHAPTER 1:
+
+Host OS, that is, the computer operating system you usually use, such as WINDOWS. Do not install any software on the host,
+except VBOX and KVM, because our security network environment rely on these virtualization technologies and advise you not 
+to use VMWARE, because it is non-open source and paid software.if you want a higher level of network security, you have to 
+abandon WINDOWS and MACOS and turn on a LINUX system with higher degree of freedom.    
+
+This CHAPTER, the question you must anwser.(You should google,bing,or Wikipedia 、CSDN by youself).
+
+1、Why is LINUX safer than WINDOWS and MACOS?
+2、Which factions are divided into Linux?
+3、Which Linux version should novice use?(please learn more about qubes whonix and tails system)
+4、What are the performance expenses of each version of linux? is it suitable for your computer?(we want to run a few virtual machines at 
+the same time on your HOST OS, and even build a physical level isolation system)
+5、How to use linux system?(you maybe need to learn a complete course, about 30 days)
+6、Can i use Windows to perform the linux system operation?
+7、what are VBOX,KVM,VMWARE?
+8、VBOX and VMWARE's various network card modes are different and how to use?
+9、Which virtualization software should novice use?
+10、How to install linux as host os?
+11、What software should your host OS be installed?
+12、How should your HOST OS set up the network, firewall and other contents?
+13、How to set the VBOX network card(Global)?
+14、What is shell, what are the common shell?
+15、What is public network address and what is private network address?
+
+SOME ADVICES：
+
+The number of times i reinstalling Arch linux is not less than 10 times. This experience tells me that you'd better try to install various
+versions of Linux on VBOX or VMWARE first, Until you are familiar with the installation and operation of Linux system, and use "rufus"
+software to burn the Linux system into U/mobile disk and install it on the computer, because your bad habits you develop on WINDOWS, it
+is likely to cause a complete collapse of linux.(For example, my obsessive-compulsive patient often manually delete some system garbage
+fiels, so rf -rf xxx, Enter, Black screen, OVER .... )
+
+Then, I directly recommend that you are in KALI(offensive system),Parrot(offensive system),Fedora,Debian,Lubuntu Wait for the linux version as your HOST OS.
+(if you like torture, you can choose Arch linux, anyway, your HOST OS will be damaged sooner or later)
+
+Novices bindly choose VBOX(you can choose KVM too),VBOX can be install windows. After installing linux on virtual software, you can
+learn and use various commands of linux. And understand the difference between each shell(bash ,zsh ,etc.)
+
+Your HOST OS software comes with VBOX or KVM and systems. Do not install any software, not limit to your country. of course, you can 
+access the address 1.1.1.1 in the browser, and the sorfware above can be installed on your HOST OS. This content involves how you set up
+HOST OS networks and firewalls.
+
+We take Debian12 as an example. your HOST OS generally installs internet, because the network card use DHCP services, connecting to network
+cables or  WIFI(network cable and WIFI directly understand as routers), After the automatic distribution is automatically allocated to you
+a network IP address (your computer ip address) and router(public network ip address) to communicate. The following is the intention of 
+understanding the public network and private network:
+1 is router(public network address, community network exit), 2 is swithch(local network gateway), 3 is your computer ip address(connect
+to the same with 4), 4 is your wife's computer IP address(connect to the sanme switch with 3), At this time,3 and 4 can be communicated.
+For example, if you use the 3 computer to enter the ping 192.168.22.6 on the command line(CMD, POWERSHELL), it can be return the data(
+Unless the other party is prohibited by ping ).
+At this time, your can set your 3 gateway address to 192.168.22.6, Netmask to 255.255.255.0, DNS set to 192.168.22.6, the ip address 
+is unchanged(192.168.22.5). The computer is on the internet. Even if your computer cannot directly connect to the local area network
+gateway(such as the local area network customs prohibited your ip address for network), the premise is that her computer's firewall is
+released on your computer ip address. if you can't understand the relevant information of the  nework settings, please correct me
+(LEARNING).
+
+
+                                                     >3（192.168.22.5） 
+1（192.168.0.0）         > 2（192.168.22.1）
+                                                     >4（192.168.22.6）
+
+Habing said that, if your HOST OS can go directly to the internet, you don't need to control it ~.~. But DNS is still recommanded to be 
+set to 1.1.1.1(CLOUDFLARE) or 208.67.220.220(OPEN DNS), it can be 95.85.95.85(a company forgot), 8.8.8.8/8.8.4.4(Google), if you use the 
+default DNS of the automatic network, Then regional network service provider(ISP) your located completely has your domain name  Analysis 
+record.
+
+Of course, this settings cannot completely ensure that your DNS is set by yourself. if the insurance is little bit 1.1.1.1, let's take a
+book.(Although i do not engage in and oppose high-risk activities)
+
+DEBIAN's DNS can be set at /etc/resolv.conf, or it can be set directly in the application. if you check the dns address of /etc/resolv.conf
+after restarting, the dns address of /etc/resolv.conf is changed to ISP address. SO it is recommanded that you set in the system application.
+This is caused by the files read by the system by default. The system comes to the control of DNS with the network card management software
+and eliminates your settings.
+
+The next step is the firewall. What you need to understand is the differences and use of UFW,iptables,nftables. The latter two learning
+costs are relatively high(14days). it is recommanded to learn UFW. Enter on your command line,
+
+sudo apt install ufw （Install the firewall, some systems have been installed, and try out the output information）
+sudo ufw status (Check it whether it is turned on)
+sudo ufw enable （enable UFW）
+sudo systemctl enable ufw (Open automatically start UFW firewall when start computer)
+sudo ufw default deny incoming (The network traffic that rejected the machine by default)
+sudo ufw default allow outgoing (The network traffic that is allowed to be out of this machine by default)
+
+This is the basic firewall settings of HOST OS. As for whether you can use other defensive tools to make the system of HOST OS, it depends
+on personal needs.in fact, no other software in installed. The possible attack surface is Software or systems such as VBOX or leaks, please
+continue to pay attention to the official community and update the system in time.
+
+A few words, APT(source), that is, The source of your installation of software packages. Do not change it. The official may be very slow 
+in some country, but it is safe. if you already have VPN to share it, you can share it with HOST OS, Such as you computers and mobile phones
+have the same WIFI, You can also use the phone itself to use hot spots to connect VPN, and set the port you want to share in VPN soft ware,
+and then check your mobile phone ip address itself(general found) on the phone. Enter on the device proxy the ip address of the mobile
+phone and the sharing port set in the VPN to see if it can be connected, you can set an agent separatly for APT, so that the use of APT
+will be much faster.
+Debian's APT proxy file seems to be in the /etc/apt/apt.conf.d/ , if not , touch a proxy.conf here, write proxy rules in it,
+The writing rules of each Linux distribution may be different, and check the information by yourself(How to add proxy for APT).
+
+In these issues, Chapter 1 also has an important pratical knowledge point, how to set the global network card of VBOX, We put it on Gateway
+OS to discuss.
+
+章节 1：
+HOST OS（宿主机），也就是你平时使用的电脑操作系统，如WINDOWS,
+不要在宿主机上装任何软件，除了VBOX、KVM，因为我们的安全网络环境要依赖这些虚拟化技术，劝你不要使用VMWARE，因为它是非开源并且是付费软件。
+如果你想要更高的网络安全级别，请抛弃WINDOWS和MACOS，转向自由度更高的LINUX系统。
+
+这个章节，你必须回答的问题。(你应该自行google、bing，或者维基百科,CSDN)
+1、为什么LINUX比WINDOWS和MACOS更安全？
+2、LINUX分为哪几个系列？
+3、新手该使用哪个LINUX版本？(请额外了解QUBES WHONIX 和TAILS系统)
+4、各版本的LINUX，性能开销如何？是否适合你的电脑？（我们要在你的HOST OS上同时运行几个虚拟机，甚至搭建物理层面的隔离系统）
+5、LINUX系统如何使用？（你可能需要学习一个完整课程，约30天）
+6、我能否先使用WINDOWS进行LINUX系统操作的练习？
+7、什么是VBOX、KVM、VMWARE？
+8、VBOX、VMWARE各种网卡模式区别以及如何使用？
+9、新手应该使用哪款虚拟化软件？
+10、如何安装LINUX作为HOST OS？
+11、你的HOST OS 应该安装哪些软件？
+12、你的HOST OS 应该如何设置网络、防火墙等内容？
+13、VBOX的网卡如何设置？（全局）
+14、什么是SHELL，常见的SHELL有哪些？
+15、什么是公网地址，什么是私网地址？
+
+
+一些建议：
+
+我重装arch linux的次数不低于10次，这段经历告诉我，你最好先在VBOX或VMWARE上面尝试安装各版本的LINUX，
+直到熟悉LINUX的安装和操作之后，再使用“REFUS”这款软件把LINUX系统烧录到U盘里并安装到电脑上，因为你在WINDOWS上养成的不良习惯，
+很可能造成LINUX的完全崩溃。（比如我这个强迫症患者经常会手动删除一些系统垃圾文件，于是出现 rm -rf xxx ,回车，黑屏，OVER....）
+
+那么，我直接建议你在KALI（进攻型系统）、PARROT（进攻型系统）、FEDORA（开发型系统，性能开销较大）、DEBIAN12（性能开销稍微大）、Lubuntu(性能开销极小)
+等LINUX版本当中选择一个作为HOST OS。（喜欢折磨可以选择ARCH LINUX，反正你的HOST OS迟早会搞坏的）
+
+新手盲选VBOX（喜欢折腾可以选KVM），VBOX可以安装在WINDOWS上，在VBOX等虚拟化软件上安装LINUX后，你就可以学习和使用LINUX的各种命令，
+以及了解一下各个SHELL（BASH、ZSH等）的区别。
+
+你的HOST OS 除了VOBX或KVM和系统自带的，不要安装任何软件，不限于你所在的国家。当然，你可以在浏览器访问1.1.1.1这个地址，那上面的软件可以装在你的HOST OS 上。
+这个内容就要涉及到你如何设置HOST OS 的网络以及防火墙了。
+
+我们以 DEBIAN12.4.0 为例，你的HOST OS 一般情况下安装好就能上网，因为网卡使用了DHCP服务，接上网线或者WIFI（网线和WIFI直接理解为路由器）
+后自动分配给你一个内网IP地址（你的电脑IP地址）和路由器（公网IP地址）进行通讯，以下理解公网和私网示意图：
+1为路由器（公网地址，小区网络出口），2为交换机（局域网网关），3为你的电脑IP地址（和4连接同一个交换机），4为你老婆的电脑IP地址（和3连接同一个交换机），
+此时3和4是可以进行通信的，比如你用3的电脑在命令行（cmd、powershell）上输入 ping 192.168.22.6 是可以返回数据的（除非对方禁止PING），
+这时你就可以把你（3）的网关地址设置为192.168.22.6，NETMASK设置为255.255.255.0,DNS设置为192.168.22.6，本机IP地址不变（192.168.22.5），借助你老婆的
+电脑进行上网了，即使你的电脑无法直接连接局域网网关（比如局域网网关禁止你的IP地址进行联网），还有一个前提是她电脑的防火墙对你这个电脑IP地址放行。
+理解不了自行查阅网络设置相关资料，不对请指正。（学习ING）
+
+
+                                                     >3（192.168.22.5） 
+1（192.168.0.0）         > 2（192.168.22.1）
+                                                     >4（192.168.22.6）
+ 
+
+话说回来，如果你的HOST OS 能够直接上网，就不用管了～。～ ，但是DNS还是建议设置为1.1.1.1（CLOUDFLARE DNS）或者208.67.220.220（OPEN DNS）,
+也可以是95.85.95.85（某公司忘了）、8.8.8.8\8.8.4.4（谷歌），如果你使用自动联网默认的DNS，那么你所在地区网络服务提供商（ISP）就完全拥有你的域名解析记录了，
+当然这个设置也不能完全保证你的DNS是自己设置的，保险一点还是去1.1.1.1看看吧。（虽然我并不从事并反对高危活动）
+DEBIAN的DNS 可以在 /etc/resolv.conf 进行设置，也可以直接在应用程序里进行设置，如果在重启后检查发现/etc/resolv.conf 的DNS地址改回了ISP的地址，
+那么建议你在系统应用程序里设置，这是系统默认读取的文件导致的，系统自带网卡管理软件争夺了DNS的控制权，消灭了你的设置。
+
+接下来就是防火墙了，你需要了解的是UFW、IPTABLES、NFTABLES的区别以及使用，后两者学习成本还是比较高的（14天），建议学习UFW的使用就可以了，以DEBIAN12为例，
+在你的命令行上输入， 
+sudo apt install ufw （安装UFW防火墙，有的系统已经装好了，试一下看输出信息就知道了）
+sudo ufw status (检查是否开启)
+sudo ufw enable （启用）
+sudo systemctl enable ufw (开机自动启动防火墙)
+sudo ufw default deny incoming (默认拒绝进入本机的网络流量)
+sudo ufw default allow outgoing (默认允许从本机外出的网络流量)
+这就是HOST OS基本的防火墙设置了，至于你能否利用其它防御性工具进行HOST OS 的系统加固就要看个人需求了，其实不装其他软件，可能的攻击面就是
+VBOX等软件或系统本身漏洞了，请持续关注官方社区并及时更新系统。
+
+罗嗦几句，APT（源），也就是你安装软件包的来源，不要乱改，官方的可能很慢，但是很安全，如果你已经有了一个VPN可以分享给HOST OS 使用，比如你的电脑和手机连同样的WIFI，
+也可以手机本身开热点给电脑使用，用你的手机连接VPN，并在VPN软件中设置你要分享的端口，然后在手机上查询手机本身的IP地址（一般都能找到），在电脑的浏览器代理上输入
+手机的IP地址和VPN里设置的分享端口，看看是否能联网，能连的话就可以给APT单独设置代理，这样APT的使用会快很多。
+DEBIAN的文件好像是在 /etc/apt/apt.conf.d/ ,如果没有的话，就touch 一个proxy.conf，在里面编写代理规则，各个LINUX发行版本的编写规则可能不同，
+自行查阅资料（如何给APT添加代理）。
+
+这些问题里，章节1 还有一个重要的实操知识点就是，VBOX的全局网卡如何设置，我们放到GATEWAY OS 去讨论。
+
+
+
+
+
+
+
+
+
+
+
+
+
