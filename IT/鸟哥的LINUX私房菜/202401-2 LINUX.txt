@@ -1,0 +1,120 @@
+/*
+ * @Author: pt13 
+ * @Date: 2024-01-06 12:45:06 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2024-01-07 03:43:34
+ */
+
+###第一章的读书记录丢失了，那就从第二章开始吧
+
+二、了解LINUX
+酷学园（鸟哥认为学习LINUX的好地方）NETMAN，www.study-area.org；
+LINUX的入门学习包括学习硬件基础、选择DISTRIBUTION、操作基础技能、VI编辑器、SHELL和SHELL SCRIPT、包管理系统、网络基础的建立；鸟歌推荐在STUDY-AREA进行学习；
+仔细观看命令行反馈的错误信息并理解；DEBUG=除错；
+养成排错记录的习惯，将错误信息、引发状况、解决方法记录清楚，最后归类存档；
+看到好文章，应该COPY并归类存档，并标注出处；
+LINUX专精必须学习SHELL环境、SHELL SCRIPT、正规表达式、管线命令、数据流重导向；
+LINUX硬件档案都存储在/dev目录内；IDE硬盘机：/hd，SCSI/SATA/USB：/sd，软盘：/fd，打印机：lp或/usb/lp，鼠标：/usb/mouse或/psaux，CDROM/DVDROM：/cdrom；
+主要启动记录区（MBR）=MASTER BOOT RECORD；分割表=PARTITION TABLE；磁盘分割的意思是对64BYTES的分割表进行分割，MBR（主要启动记录程序）分割表仅能分为四个部分（PRIMARY，EXTENDED）；
+LINUX的MBR分割方式，分为主要分割（PRIMARY）、延伸分割（EXRENDED），延伸分割的磁盘上还可以继续进行逻辑分割（LOGICAL PARTITION）；
+BIOS（韧体，写入到主板硬件）是开机后硬件读取的软件，CMOS则记录了硬件参数并嵌入主板的存储器；
+硬件启动后BIOS将读取硬盘第一个扇区的MBR位置，MBR内置了BOOT LOADER（读取核心档案引导程序）；
+BOOT LOADER功能包括提供选单、载入核心档案、转交管理权给其它管理程序；
+多系统的实现案例如PRIMARY安装WINDOWS，EXTENDED（也可以是PRIMARY 2）安装LINUX；
+每个分割槽都有自己的启动扇区（BOOT SECTOR）；要装双系统就要先装WINDOWS再装LINUX，因为WINDOWS的MBR无选单功能；
+根目录（/）必须挂载在某一个分割槽（P、P、P、E当中的一个）；
+旧主板的BIOS可能无法读取最新的硬盘，但至少能读取磁盘的开头，因此该分割槽与系统启动文件目录放在一起即可解决，
+/BOOT 必须放在磁盘开头（如分为 /（PRIMARY），/BOOT（PRIMARY），/HOME（PRIMARY）），SWAP（LOGICAL）；
+BOOT LOADER 的安装地点分别是MBR或BOOT SECTOR；开机时一般可以按DEL进入BIOS界面；
+LVM=PHYSICAL VOLUME，用于弹性调整文件系统容量的机制；SOFTWARE RAID（软件仿真磁盘阵列）；
+VFAT（VFAT文件系统），同时支持WINDOWS和LINUX数据类型；
+SOFTWARE RAID一般建立在延伸分割槽；
+目前LINUX DISTRIBUTIONS的开机管理程序大多使用GRUB，必须将其安装到MBR当中（各个分割槽的BOOT SECTOR）；
+apm(ADVANCED POWER MANAGEMENT)，早期电源管理模块；acpi(ADVANCED CONFIGURATION AND POWER INTERFACE)，近期电源管理模块；
+boot:nofb，意味着取消显卡上的缓冲存储器侦测（因为笔记本显卡常常是整合的，不是PCI外接）；
+WINDOWS装在/DEV/SDA，LINUX装在/DEV/SDB，但LINUX的GRUB要装在/DEV/SDA上才能够选择开机系统；
+CTRL+ALT+F1～F6可以使用六个不同的TERMINAL以登录（终端机）；CTRL+ALT+F7可以接入图形接口（登录屏幕）；
+如果是以纯文本形式登录的环境，无法切换至F7（tty7）图形接口，但可以通过“startx”启动桌面环境；
+文本登录后取得的程序称之壳（SHELL），通过SHELL与系统（LINUX DISTRIBUTION’S KERNEL）联系，KERNEL与硬件联系；
+BASH格式：COMMAND+OPTIONS+PARAMETER1 PARAMETER2...；"\"符号可以离开“ENTER”指令跳到下一行继续输入指令；
+"echo $LANG"或locale=显示当前支持语系； 
+COMMAND:cal,bc,data，如cal 2022,bc(quit 退出),data 2022； 
+“TAB”键可以命令补全或查看关联命令；“CTRL+C”=中断程序；“CTRL+D”=END OF INPUT=EXIT；
+错误讯息非常重要，一定要仔细查看；
+"data(1)"：
+"(1)"=用户在SHELL环境中可以操作的指令和可执行文件，
+"(2)"=系统核心可呼叫的函数与工具等，
+"(3)"=一些常用的函数（function）与函数库（library），大部分为C的函数库（libc），
+"(4)"=装置档案的说明，通常在/dev下的文档，
+"(5)"=配置文件或者是某些档案的格式，
+“(6)”=游戏(games),
+"(7)"=惯例与协议等，例如LINUX文件系统、网络协议、ASCII code等说明，
+"(8)"=系统管理员可用的指令，
+"(9)"=跟KERNEL有关的文件，
+MAN PAGE分为几个部分：NAME，SYNOPSIS（语法），DESCRIPTION（完整说明），OPTIONS（针对SYNOPSIS列举所有可用选项），COMMANDS，FILES（程序或数据与之关联选项），SEE ALSO（其他有关说明），EXAMPLE（案例），BUGS（BUG）；
+MAN PAGE常用按键，"/string"=向下寻找string在这个字符串，"?string"=向上寻找string这个字符串，"n"or"N"=寻找下一个string或上一个string,"q"=推出；
+文字接口下，了解信息的指令或文件格式必须用到man、info；
+nano中ctrl=control,M=alt；"netstat -a"=网络联机状态；"ps aux"=背景程序状态；
+“sync”=将现有数据写入硬盘；shutdown/reboot/halt等指令已包含先执行sync；
+run level 0=关机；run level 3=纯文本模式（亦可使用startx进入图形接口）；run level 5=含图形模式；run level 6=重新启动；init 0=关机；
+fsck=文件系统检查指令；开机管理程序一般为grub或lilo（远古时代）；
+在grub引导程序时，可以通过"e"进入kernel的编辑，在最后方输入single，键入Enter,键入b，即可进入单人维护模式（用于修改ROOT密码）；echo $LANG或locale获得本地语系；data、cal、bc；tab的命令补齐与文档补齐；
+CTRL+ALT+BACJSPACE=重启Xwindows；man -f passwd=有多少个关于passwd的解释文档，以及分别是哪些和相应级别；
+man -k string=查找关键词string；man -K string=查找整个man page，每个man page file都会提示是否需要显示，根据提示输入相应操作；
+foo1 -foo2 foo3 foo4=foo1一定是指令，-foo2是指令的选择项目参数，foo3和foo4可能是foo1的参数设定值，也可能是额外加入的参数；
+乱码一般为语系设定不符合；输入两次TAB即可关联到当前输入指令的关联可执行预设指令，如需要知道ls开头的指令则键入"ls [tab] [tab]"；
+档案拥有者、群组概念、其他人概念，天神（ROOT）；
+ROOT相关信息在/etc/passwd；用户密码信息在/etc/shadow；群组记录在/etc/group；
+ls=list；
+请解释“-rw-rw-r--  1 alloyer alloyer  747 Dec 25 05:18  1.txt”各个段的含义，-rw-rw-r--=当前权限，1=连接数，第一个alloyer表示"1.txt"属于档案拥有者"alloyer"，第二个alloyer表示"1.txt"属于群组"alloyer"的文件，747表示该文件大小（bytes），Dec 25 05:18=该文档最后修改时间，1.txt=该文件名称,"-"=无权限，r=可读，w=可写，x=可执行，第一段"rw-"=档案拥有者alloyer的权限，第二段"rw-"=群组alloyer的权限，第三段"r--"表示其他人（其他组）的权限，最开头的'-'=档案（文件夹），如果是d=目录，如果是l表示(link file)，如果是b表示装置文件含有可存储接口设备，如果是c表示装置文件含有串行端口设备如键盘鼠标；
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

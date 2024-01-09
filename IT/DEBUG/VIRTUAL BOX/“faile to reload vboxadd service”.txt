@@ -1,0 +1,15 @@
+1、打开机器，发现“faile to reload vboxadd.service”，无法启动MAHINE
+
+2、尝试DEBUG，
+查看dmesg等系统报错信息；
+发现vboxadd无法关联linux kernel，无法启动vboxadd.service；
+重装VBOX ADDTIONS TOOLS，运行virtualbox linux additions.sh(来自virtualbox linux additions.iso)；
+发现许多依赖项丢失，且不适合手动安装；
+尝试其他方案，无果；
+
+3、解决方案
+回退GUEST OS 快照，启动成功
+
+4、出错原因
+可能是GUEST OS某些系统选项升级更新导致。
+
