@@ -1,0 +1,61 @@
+/*
+ * @Author: pt13 
+ * @Date: 2024-01-11 20:48:52 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2024-01-11 22:39:51
+ */
+
+
+三、LINUX档案与目录管理
+"-"表示上一层目录；pwd=PRINT WORKING DIRECTORY,pwd -P能够显示完整路径（包括链接后的路径）；
+mkdir建立单个目录，mkdir -p建立下层递归目录；rmdir -p用于递归删除所在目录（也可以使用rm -rf的方式）；
+键入指令时，系统会根据环境变量定义的目录寻找该指令的可执行文件；使用echo $PATH输出环境变量；
+假如"ls"命令在/root目录下，只需要键入PATH="$PATH":/root (添加路径)；PATH路径中存在相同的指令“ls”，那么哪个目录先被搜索就执行哪个目录的"ls"；不同身份的预设PATH不同，本目录(.)不要加入PATH中；
+cp -i -f -d -a -l -p -r -s -u；rm -i -f -r(危险选项！)；不要将"-"作为文件开头，因为"-"同时是选项的开头；
+cat,tac,nl,more,less,head,tail,od；cat -,-b,-E,-n,-T,-v；cat=Concatenate；od -t a c d f o x；
+mtime=modification time,ctime=status time,atime=access time；touch -a -c -d(--date) -m -t ；
+umask,umask -S,umask=被拿掉的权限，umask=0002表示默认权限为ROOT=7,USER=7，GROUP=7,OTHERS=5；"umask 002"=设定umask=002；
+chattr,+，-，=；"chattr +A"=存取此档案时atime将不会被修改；"chattr +S"=异步写入磁盘，档案任何修改将同步写入磁盘；"chattr +a"=该文件只能增加数据而不能减少数据，只有ROOT可以设定该属性了；"chattr +c"=自动将该文件压缩，读取时自动解压；"chattr +d"=dump程序执行时，该文档不会被dump备份；"chattr +i"=不能删除、改名、修改设定的链接，仅ROOT可以使用；"chattr +s"=如果被删除，将会完全移除出硬盘；"chattr +u"=与s相反，删除文件后其实数据还在硬盘，可以使用救援恢复；
+lsattr,-a,-d,-R；
+特殊权限SUID，SGID，SBID；如[-rwsr-xr-x]，在文件拥有者位置上x被s代替，SUID权限仅对二进制程序生效，执行者对于该程序（如passwd）需要有x权限，该权限仅在run-time中有效，执行者将临时拥有OWNER的权限，如普通用户仍然可以修改属于root的密码文件shadow，因为普通用户进行passwd（修改密码的二进制程序）的过程中临时获得了ROOT的权限，但SUID的权限无法用在SHELL SCRIPT和目录上；
+SUID与SGID的不同在于"s"的代替位置不同，SUID的s代替了拥有者的x位，SGID的s代替了群组的x位，因此一个程序设定SGID后，普通用户对于该程序如果具有x权限，可以通过程序指令进入某些目录（如/usr/bin/locate /var/lib/mlocate.db），如果普通用户对该目录有w权限，就可以新建档案，此时普通用户获得了群组slocate的支持（执行者在执行该程序时获得了该程序所在群组的支持，那么此时普通用户在该目录新建档案，档案的群组也属于该程序的群组），SGID也可以用在目录上；
+SBIT=STICKY BIT，SBIT目前只针对目录有效，用户对A目录具有w,x的权限，对A目录的任何文档可以进行添加、修改或删除，A目录添加SBIT权限后，用户仅能对自己建立的文件或目录进行操作，无法对别人在该目录的文档进行操作，任何人都可以新增或修改文件，但仅有该文件、目录的拥有者和ROOT能够删除该目录和文档；
+特殊权限意味着临时借助档案、目录拥有者或者ROOT的权限；SUID=4,SGID=2,SBIT=1；特殊权限的设定需要使用“chmod”直接设定，如"chmod 4755","chmod 2755","chmod 1755","chmod 6755"(同时具有SUID和SGID权限)；"chmod u+s",  "chmod g+s","chmod o+t"也可以实现添加特殊权限，例如chmod g+s,o+t test；如果文件或目录原本权限为766，亦即用户无x权限，那么在添加s或t时S或T都会变成大写，代表空值；
+file string，用于了解文档的基本数据类型等信息；"which string"可用于搜索指令路径（根据$PATH），"type string"可用于查询指令相关信息；find尽量少用，因为烧硬盘，可以用whereis和locate代替(数据库型检索)；
+whereis -b -m -s -u；locate -i -r；
+updatedb=根据/etc/updatedb.conf的设定搜寻系统硬盘内的文件名，并更新/var/lib/mlocate的数据库；
+locate=依据/var/lib/mlocate的数据库记录，找出用户输入的string；
+"find PATH option action",find ./ -mtime n string(n天以前的n那一天，如n=4，意味着4天前的那一天),find ./ -mtime +n string,find ./ -mtime -n string（n天内，n=4，以为着四天内）,find ./ -newer file string；进一步解释"find"的n用法，"+4"代表大于等于5天前，"-4"代表小于等于4天内，"4"等于往前4-5那一天；
+find -uid n,find -gid n,find -user name,find -group name,find -nouser,find -nogroup；
+find -name filename,find -size +50k,find -type s,find -perm -mode(find -perm -0744),find /var -type s,find / -perm +7000(7000=---s--s--t，只要含有s或t权限都列出，-7000=---s--s--t的三个权限都要有才列出)；find -perm +7000 -print,"find / -perm -7000 -exec ls -l {} \;" ,find / -size +1000k(1000m,1000g)；
+find的特殊功能"action"，如"find / -perm -7000 -exec ls -l {} \;"，"{}"=find找到的内容放入其中，"-exec"到"\;"代表的是find的额外动作也就是"ls -l {}"（因为";"在BASH中有特殊含义，需要用到"\"进行转义，亦即原本语法是没有"\"的）；"find /etc -size +50k -a -size -60k -exec ls -la {} \;",-a代表and的意思，亦即列出大小介于50~60k之间的文件；"find /etc -size +50k -a ! -user root -exec ls -la {} \;"="find /etc -size +50k -a ! -user root -type -f -exec ls -la {} \;"，列出大小大于50k且拥有人不是ROOT的文件（！代表的是 “不是后面的选项”之意）；"find /etc -size +1500k -o -size 0"，"-o"意味着or的意思；
+对于目录，用户要有x权限才能进入；对于文件，用户要有r权限才能阅读；对于修改文件，用户要有r,w权限以及一款编辑器NANO、VI、VIM；建立档案，用户要有w、x权限；
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

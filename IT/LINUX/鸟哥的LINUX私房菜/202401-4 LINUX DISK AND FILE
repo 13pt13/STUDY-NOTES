@@ -1,0 +1,88 @@
+/*
+ * @Author: pt13 
+ * @Date: 2024-01-14 13:36:31 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2024-01-15 03:21:30
+ */
+
+
+三、LINUX的文件系统与硬盘关系
+EXT2=LINUX SECOND EXTENDED FILE SYSTEM；
+一个分割槽只能被格式化为一个文件系统，所以一个FILESYSTEM就是一个PARTITION，而随着新技术的出现，一个分割槽可以格式化为多个文件系统（LVM），多个分割槽也可以合成一个文件系统（LVM，RAID）；
+EXT2文件系统会将文件的文件属性、权限与实际分别放到不同区块，权限与属性放到INODE中，实际数据放到DATABLOCK中，还有一个区块（SUPER BLOCK）记录整个文件系统的信息，包括INODE和BLOCK的总量、使用量、剩余量；
+每个INODE和BLOCK都有编号，INODE内置BLOCK编号，如果能找到INODE就能找到BLOCK，文件过大会使用多个BLOCK；
+如INDOE4记录了BLOCK7,8,9,10，那么打开了INODE4就可以一次性读取所有区块，这种数据存取方法成为索引式文件系统（INDEXED ALLOCATION）；而FAT文件系统读取顺序类似INODE4>BLOCK7>BLOCK8>BLOCK9>BLOCK10；FAT文件系统会导致BLOCK数据过于离散影响存取效能，因此常常需要进行碎片整理，EXT文件系统则不太需要；
+由于应对过大的文件系统，EXT2下BLOCK通常会组合成BLOCK GROUP进行管理；
+一个BLOCK只能放一个档案，档案不够大时该磁盘剩余空间就会浪费掉；
+INODE至少包含以下内容，存取模式r,w,x，拥有者与群组，容量，档案建立或状态改变时间，最近一次读取时间，最近修改时间，档案特性旗帜FLAG（SETUID），档案内容指向（POINTER）；
+每个档案仅占用一个INODE，INODE为固定大小128BYTES，因此档案数量与INODE数量有关；
+由于INODE只有128BYTES，为了存储足够的档案信息，INODE将记录BLOCK的号码定义为12个直接，一个间接，一个双间接，与一个三间接记录；所谓间接就是把一个BLOCK区再拿来记录其他BLOCK号码，档案持续增多时就会利用双间接，也就是两个BLOCK作为其他BLOCK号码记录区，三间接类推；
+BLOCK=256K，每笔BLOCK号码消耗4BYTES，1k BLOCK为例，12个直接指向为12×1k=12k（因此可以有12笔记录），间接指向为256*1k=256k，双间接指向为256*256*1k=256^2k,三间接指向为256*256*256*1k=256^3k，因此文件系统将BLOCK格式化为1K时，能容纳最大档案为16GB，12+256+256^2+256^3=16GB，但该方法不能用在计算2K,4KBLOCK中；
+SUPERBLOCK=1024BYTES，SUPERBLOCK记录整个FILESYSTEM相关信息，没有SUPERBLOCK就没有FILESYSTEM，它记录了INODE和BLOCK的总量，未使用和已使用的INODE/BLOCK数量，BLOCK与INODE的大小，FILESYSTEM的挂载时间、最近一次写入数据时间、最近一次检验磁盘时间（FSCK），一个VALID BIT数值（挂载时VALID BIT=0，未挂载VALIDBIT=1），可以用dumpe2fs呼出SUPERBLOCK信息操作；
+每个BLOCK GROUP都可能含有SUPER BLOCK，除了第一个BLOCK GROUP会含有SUPER BLOCKY以外，后续BLOCK GROUP若含有SUPER BLOCK则可能为第一个SUPER BLOCK的备份；
+FILESYSTEM DESCRIPTION描述每个BLOCK GROUP的开始与结束的BLOCK号码；
+BLOCK BITMAP可以记录哪些BLOCK被使用，哪些档案被删除后应该释放BLOCK；
+INODE BITMAP与BLOCK BITMAP类似，INODE BITMAP记录的是使用与未使用的INODE号码；
+"dumpe2fs" -b -h，"ls -li"可以查看实际占用的INODE号码；
+如EXT2下建立一个新档案，文件系统会分配1个INODE与所需数量的BLOCK，假如一个BLOCK=4BYTES，而要建立100KBYTES档案，则分配1个INODE以及25个BLOCK，但因为INODE只有12个直接指向，因此需要多一个BLOCK来记录区块号码（间接）；
+由于目录树是由根目录开始读起，因此系统可以通过挂载信息找到挂载点的INODE号码，此时能得到根目录的INODE内容，并依据该内容一层一层读取BLOCK；
+当BLOCK档案太过离散（如分布在文件系统的最前面和最后面，机械手臂移动幅度过大），可以通过将该硬盘数据全部复制到另一个硬盘并格式化该硬盘，再将数据复制到该硬盘即可解决该问题；
+新建档案或目录时，EXT2根据INODE BITMAP找到没有使用的INODE号码，将新建档案或目录权限/属性写入，根据BLOCK BITMAP找到没有使用的BLOCK号码，写入BLOCK，且更新INODE的指向数据，将写入的INODE和BLOCK同步到INODE BITMAP和BLOCK BITMAP并更新SUPER BLOCK；
+一般称INODE TABLE和DATA BLOCK为数据存放区，SUPER BLOCK、BLOCK BITMAP与INODE BITMAP等区段称为METADATA（中介资料，经常变动的资料）；
+日志式文件系统主要应对INCONSISTENT（如突然断电造成数据不同步，使用e2fsck效率较低）的情况；
+日志式文件系统=JOURNALING FILESYSTEM，专门划出一个区块，专门记录写入或修订档案时的步骤；首先在日志记录区记录某个档案要写入的信息，在实际写入时写入档案的权限与数据并开始更新METADATA，在完成数据与ETADATE的更新后，在日志区块记录中完成该档案记录（万一同步过程发生问题，系统将根据日志区块记录快速修复对应FILESYSTEM）；
+EXT3相较于EXT2的显著进步是可利用性、数据完整性、速度及易于转换，日志式文件系统避免数据损毁，加快写入和修复速度；
+ASYNCHRONOUSLY=异步处理，当系统加载档案到内存后档案没有改动过将定义为CLEAN（干净），改动过将定义为DIRTY（脏），系统不定时将脏数据写入硬盘，也可以使用SYNC；
+文件系统与目录数结合的动作称之为“挂载”（MOUNT），文件系统要链接到目录树才能使用，因此挂载点一定是目录，该目录作为进入该文件系统的入口，因此并非有文件系统就可以使用，必须挂载到某个目录后文件系统才能够使用；
+挂载点在"/"，因此"/.","/.."都指向同一个INODE，"/.."指的也是"/"它本身；
+LINUX KERNEL通过VFS=VIRTUAL FILESYSTEM SWITCH管理FILESYSTEM，日常操作中VFS将帮助我们管理FILESYSTEM，我们并不清楚PARTITION上方的FILESYSTEM是什么，因此/dev/hda1可以是EXT3，/dev/hda2K可以是reiserfs，我们不需要自定义设定读取文件系统的定义，由VFS帮我们管理FILESYSTEM；
+df -a -k -m -h -H -T -i；du -a -h -s -S -k -m；
+HARD LINK（硬链接）的本质是两个档案最终指向同一个INODE，因此也都能进行档案数据的修改，也不会占用INODE和BLOCK号码（刚好占满某个BLOCK除外）；HARD LINK不支持链接到目录，因为这会导致两个目录的数据都要对应链接，造成很大的复杂度；
+SYMBOLIC LINK（软链接，也就是快捷方式），本质是建立了一个档案来完成指向源数据的动作，因此需占用实际的INODE和BLOCK,当你通过快捷方式修改数据，源档案也会更改（硬链接不同的是）；ln -s -f ；
+新增磁盘需要的动作有：1、对磁盘进行分割，以建立可用的PARTITION 2、对该PARTITION进行格式化（FORMAT），以建立可用的FILESYSTEM 3、对FILESYSTEM进行校验 4、在LINUX上建立挂载点，并将磁盘挂载上来；
+fdisk -l,"fdisk /dev/xxx"(不加数字,因为fdisk针对的是整个磁盘而非某个PARTITION)；使用"fdisk"进入操作界面，当你使用"d"删除某个分割槽后，其下逻辑分割槽同样会被删除；以ROOT身份进行PARTITION分割应该使用单人维护模式更加安全；
+使用"fdisk"将硬盘进行分割后，接下来就是在硬盘上建立文件系统，使用"mkfs"=make filesystem；
+mkfs -t xxx(ext2/ext3/vfat/btrfs...)，如“mkfs -t ext3 /dev/hdc6”；
+ext2/ext3公用程序"mke2fs",mke2fs -b -i -c -L -j(加入-j后ext2自动成为ext3文件系统)；
+"fsck"(与e2fsck的选项 -f -D兼容，用来检验FILESYSTEM是否出错) -t -A -a -y -C,使用fsck实际是呼叫e2fsck进行操作；fsck可能会造成FILESYSTEM的损坏，你不应该卸载PARTITION后进行fsck；fsck发现的问题数据会放到lost+found目录当中；
+"badblocks"（用来检验硬盘或软盘有无坏轨） -s -v -w(PARTITION已有档案时不要使用)；
+挂载点就是目录，目录是进入磁盘分割槽的入口，挂载前需要注意的有1、单一文件系统不应该被重复挂载在不同的挂载点（目录）中 2、单一目录不应该重复挂载多个文件系统 3、要作为挂载点的目录应该都是空目录才对（否则先前资料可能因为新的挂载而被覆盖隐藏直到卸载该挂载）；
+mount -a -l -t -n -L（利用硬盘的LABEL进行挂载操作,这样操作会方便很多，查阅e2label） -o（-o 后面的额外参数）:ro,rw,async(预设值),sync,auto,noauto,dev,nodev,suid,nosuid,exec,noexec,user,nouser,defaults(默认值为rw,suid,dev,exec,auto,nouser,and async),remount；
+将建立的/dev/hdc6挂载到/mnt/hdc6上，如"mkdir /mnt/hdc6""mount /dev/hdc6 /mnt/hdc6""df"(查看是否挂载)；
+因为SUPERBLOCK的存在，mount的使用已经非常便利，LINUX将通过分析SUPERBLOCK搭配LINUX驱动程序尝试挂载；了解哪些需要手动挂载操作的FILESYSTEM主要参考以下两个文档 /etc/filesystems(系统指定的测试挂载文件类型)与 /proc/filesystems(LINUX已加载的文件系统类型)；
+LINUX支持的文件系统驱动程序目录：/lib/modules/6.2.0-39-generic/kernel/fs；
+VFAT支持的文件系统驱动程序目录：/lib/modules/6.2.0-39-generic/kernel/fs/vfat/；
+根目录出现只读状态可以使用"mount -o remount,rw,auto /"重新挂载（单人维护模式时根目录通常为只读）；我们随时可以利用mount将一个目录挂载到另一个目录中（不是挂载文件系统，是额外挂载某个目录），如"mkdir /mnt/home" "mount --bind /home /mnt/home"，其实是连接到同一个INODE（这里利用的是mount --bind功能）；
+umount -f -n,卸载方式可以是卸载装置名称或者卸载挂载点；
+mknod [b c p] [major] [minor]；
+e2label 硬盘名称 新的LABEL名称，LABEL的优点是系统通过LABEL挂载硬盘，不管硬盘插在哪个IDE/SATA口都无需手动更改，缺点是当新接入的硬盘LABEL与现有相同会很麻烦；
+tune2fs -l -j -L；
+hdparm -i -c -d -m -X -T -t；
+为了让系统自动挂载，就需要到/etc/fstab进行修改，根目录必须先于其他MOUNT POINT被挂载，其他MOUNT POINT必须为已建立目录，指定的MOUNT POINT 需要遵守系统目录架构原则，所有MOUNT POINT同一时间只能挂载一次，所有PARTITION同一时间只能挂载一次，如需要卸载MOUNT POINT必须先将当前工作目录切换到MOUNT POINT之外；
+fstab的错误书写可能导致无法开机；特殊装置loop挂载（映像档案ISO不刻录就在系统中使用）；
+可以通过dd建立空的大档案，并将其格式化后以LOOP形式挂载到某个目录，实现分割槽效果；    
+在前期没有设定SWAP的情况下，依然可以通过后期操作建立SWAP；p290
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

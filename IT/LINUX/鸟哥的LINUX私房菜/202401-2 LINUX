@@ -2,7 +2,7 @@
  * @Author: pt13 
  * @Date: 2024-01-06 12:45:06 
  * @Last Modified by: pt13
- * @Last Modified time: 2024-01-07 03:43:34
+ * @Last Modified time: 2024-01-11 22:39:54
  */
 
 ###第一章的读书记录丢失了，那就从第二章开始吧
@@ -67,6 +67,48 @@ foo1 -foo2 foo3 foo4=foo1一定是指令，-foo2是指令的选择项目参数�
 ROOT相关信息在/etc/passwd；用户密码信息在/etc/shadow；群组记录在/etc/group；
 ls=list；
 请解释“-rw-rw-r--  1 alloyer alloyer  747 Dec 25 05:18  1.txt”各个段的含义，-rw-rw-r--=当前权限，1=连接数，第一个alloyer表示"1.txt"属于档案拥有者"alloyer"，第二个alloyer表示"1.txt"属于群组"alloyer"的文件，747表示该文件大小（bytes），Dec 25 05:18=该文档最后修改时间，1.txt=该文件名称,"-"=无权限，r=可读，w=可写，x=可执行，第一段"rw-"=档案拥有者alloyer的权限，第二段"rw-"=群组alloyer的权限，第三段"r--"表示其他人（其他组）的权限，最开头的'-'=档案（文件夹），如果是d=目录，如果是l表示(link file)，如果是b表示装置文件含有可存储接口设备，如果是c表示装置文件含有串行端口设备如键盘鼠标；
+chgrp=改变所属群组，chown=改变拥有者，chmod=改变档案权限，-R可以进行递归执行（该路径或目录下所有你文件）；
+u=user,g=group,o=others，如chmod u/g/o +x 1.txt；
+隐藏权限=chattr,查看隐藏权限=lsattr,特殊权限相关信息路径/etc/sudoers；
+文件系统还包括ACL隐藏权限，用法如setfacl
+FHS=FILESYSTEM HYERARCHY STANDARD；
+/bin目录下通常是可执行文件，单人维护模式仍可操作；/boot目录下通常开机所需档案如LINUX核心档案、开机选单、开机所需配置文件，kernel常用名为"vmlinuz"，grub启动方式会存在/boot/grub；/dev目录下通常是装置或接口设备档案信息；/etc下通常是系统主要配置文件，重要档案如/etc/inittab,/etc/init.d,/etc/modprobe.conf,/etc/X11/,/etc/fstab,/etc/ssysconfig；
+/etc/init.d/目录下通常是所有服务的预设启动script；/etc/xinetd.d/目录下通常是super daemon管理的各项服务的配置文件目录；/etc/X11/目录下通常是与X WINDOWS的各种配置文件； 
+/home放置用户的个人档案目录；/lib放置开机时要用到的函数库，/lib/modules放置核心相关的模块（驱动程序）；
+/media放置可移除的装置；/mnt用途与/media相同，作为暂时挂载的目录使用；/opt通常是第三方软件放置目录；
+/root是家目录（根目录）；
+/sbin下放置开机所需要的档案；/usr/sbin/则放置某些服务器软件程序；自行安装产生的系统执行文件一般放在/usr/local/sbin/当中，常见fdisk,fsck,ifconfig,init,mkfs etc..；
+/srv（server）目录下通常是一些网络服务启动所需的数据目录；/tmp下存放临时文件，任何人都可以存取；
+/lost+found通常存储文件系统发生错误的遗失片段，通常是分割槽顶层，如加装/disk硬盘，系统将自动产生/disk/lost+found目录；
+/proc本身是一个虚拟文件系统目录，其数据都是放在RAM当中如系统核心,Process,网络状态等，本身不占用硬盘空间；
+/sys与/proc类似，主要记录与kernel相关信息，包括已加载核心模块，侦测到的硬件装置信息；
+五个不能脱离根目录（/）的目录:/etc,/bin,/dev,/lib,/sbin；
+/usr=/Unix software resource（UNIX操作系统软件资源）；/usr类似/C:\Windows+C:Program files；
+/usr/bin/放置了绝大部分用户可执行的指令；/usr/include/放置C/C++等程序语言的HEADER与包含档案（INCLUDE）；
+/usr/lib/放置各类函数库与目标档案以及开发者惯用SCRIPT，X86_64的LINUX还会产生/usr/lib64/目录；
+/usr/share/放置共享文件，常见文件如man,doc,zoneinfo；/usr/src=一般源码位置，/usr/src/linux=核心源码位置；
+/var是在系统运作后才会逐渐产生数据，针对常态性变动档案，包括CACHE，LOG FILE，LOCK FILE，RUN files；
+/var/lib是程序运行所需数据目录，如MYSQL放到/var/lib/mysql,rpm放到/var/lib/rpm；/var/lock/放置锁定数据，为了让某些装置或档案一次只能同时被一个程序使用；/var/log/放置登录文件数据，如用户登录记录，DPKG安装记录；/var/mail/放置个人邮箱目录，同时也被放到/var/spool/mail/中相互链接；/var/run/放置程序或服务的PID；/var/spool/放置队列数据，这些数据通常在使用后被销毁，/var/spool/mail/中使用者收下信件后会销毁数据；
+CENTOS网络设定目录:/etc/sysconfig/network-scripts/；
+SUSE网络设定目录:/etc/sysconfig/network/；
+NFS=network file system；SELINUX=SECURE ENHANCE LINUX(selinux)；
+绝对路径（ABSOLUTE）：从根目录（/）开始写路径；相对路径如./开头或../开头，不属于/开头就是相对路径；
+"."=当前目录，可以用"./"表示；".."=上一层目录，也可以用"../"表示；
+正规执行目录默认为/bin或/usr/sbin/，非正规执行目录需要指定目录，如"./run.sh"表示在本目录下执行run.sh；
+由于读取频率较高，不应该与根目录放在一起的目录为:/home,/usr,/var,/tmp；
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
