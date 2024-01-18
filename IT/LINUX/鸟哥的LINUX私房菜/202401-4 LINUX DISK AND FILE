@@ -2,7 +2,7 @@
  * @Author: pt13 
  * @Date: 2024-01-14 13:36:31 
  * @Last Modified by: pt13
- * @Last Modified time: 2024-01-15 03:21:30
+ * @Last Modified time: 2024-01-19 02:08:58
  */
 
 
@@ -61,7 +61,27 @@ hdparm -i -c -d -m -X -T -t；
 为了让系统自动挂载，就需要到/etc/fstab进行修改，根目录必须先于其他MOUNT POINT被挂载，其他MOUNT POINT必须为已建立目录，指定的MOUNT POINT 需要遵守系统目录架构原则，所有MOUNT POINT同一时间只能挂载一次，所有PARTITION同一时间只能挂载一次，如需要卸载MOUNT POINT必须先将当前工作目录切换到MOUNT POINT之外；
 fstab的错误书写可能导致无法开机；特殊装置loop挂载（映像档案ISO不刻录就在系统中使用）；
 可以通过dd建立空的大档案，并将其格式化后以LOOP形式挂载到某个目录，实现分割槽效果；    
-在前期没有设定SWAP的情况下，依然可以通过后期操作建立SWAP；p290
+在前期没有设定SWAP的情况下，依然可以通过后期操作建立SWAP；首先使用FDISK分割一个分割槽给系统作为SWAP，将预设的分割槽ID从LINUX ID修改为SYSTEM ID（由ID分配表决定），利用建立SWAP格式化的mkswap格式化该SWAP，使用"swapon XXX"启动SWAP；
+假设BLOCK=1024BYRES=1K，SUPERBLOCK的大小为1024BYTES，那么整个分割槽文件系统分区将第一个BLOCK（0号BLOCK）分给BOOT SECTOR，第二个BLOCK（1号BLOCK）分给SUPERBLOCK，其余BLOCK由其它档案使用；
+假设BLOCK=4096BYTES，SUPERBLOCK将会排序到0号BLOCK，为了避免浪费空间，0号BLOCK将会包含与BOOT SECTOR与SUPERBLOCK，0-1024BYTES由BOOT SECTOR使用，1025-2048BYTES由SUPERBLOCK使用，剩余2048BYTES空间将会被保留，0号BLOCK以外的BLOCK由其它档案使用；文件系统是一定会浪费掉一些剩余空间的；
+parted,"parted /dev/hdc print","parted /dev/hdc mkpart logical ext3 19.2GB 19.7GB","parted /dev/hdc 8"；大于2TB的磁盘才会用到PARTED进行分割，一般情况下使用FDISK已足够；
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
