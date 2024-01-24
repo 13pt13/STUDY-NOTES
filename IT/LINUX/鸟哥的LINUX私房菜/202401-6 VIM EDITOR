@@ -1,0 +1,38 @@
+/*
+ * @Author: pt13 
+ * @Date: 2024-01-21 01:28:07 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2024-01-21 02:18:28
+ */
+
+
+六、VIM编辑器的使用
+LINUX中的文本编辑器如emacs,pico,nano,joe,vim等等，vi与vim是一定要会的，因为vi是unix like中一定会内置的程序，很多内置程序（crontab,visudo,edquota）也会直接呼叫vi进行工作，而vim是vi的升级版，更便于程序开发与script编写等操作；
+vi分为一般模式、编辑模式、指令列模式；
+vi的一般模式下，可以进行删除、复制、粘贴等操作，但无法编辑；在一般模式下使用"/"（向下搜索）,":","?"（向上搜索）进入搜寻操作；通过i,I,o,O,a,A,r,R进入编辑模式；
+vi一般模式下h,j,k,l进行上下左右移动，ctrl+f,b,d,u可以将屏幕向上、下翻页，"n""x"（n后面接数字）可以向右移动x个字符距离，0=home键（移动到最开始），$=end键（移动到最后面），H、M、L、G可以快速移动光标到指定位置，"x""G"（x为数字）可以移动到这个档案的第x行，gg移动到档案第一行，n为重复前一个搜索动作，N为反向重复前一个搜索动作；":n1,n2s/word1/word2/g"意为n1（数字）到n2（数字）之间寻找word1这个字符并修改为word2，":1,$s/word1/word2/g"意味从第一行到最后一行寻找word1并修改为word2，":1,$s/word1/word2/gc"意味从第一行到最后一行寻找word1并修改为word2，在修改完成之前提示给用户是否确认修改；x,X为向后与向前删除一个字符，nx（n为数字）意为连续向后删除n个字符，dd为删除游标那一行的字符，ndd为删除光标向下n行字符，d1G为删除光标所在到第一行所有数据，dG为删除光标所在到最后一行所有数据，d$为删除光标所在处到该行最后一个字符，yy为复制游标那一行，nyy为复制光标所在的向下n行，y1G为复制光标所在列到第一列的所有数据，yG为复制所在列到最后一列的所有数据，y0为复制光标所在字符到该行行首的所有数据，y$为复制光标所在的字符到该行行尾的所有数据，p为向下一行粘贴，P为向上一行粘贴，J为将光标所在列与下一列数据并成一列，c为重复删除多个数据，u为还原上一个操作，CTRL+r为重复上一个动作，"."为重复前一个动作；":w",":q","wq","wq!","q!","w!"（不解释），":w filename"意为保存编辑并另存为另一个文档，":r filename"意为正在编辑某个文档是读入filename文档并将内容加入到游标后面，":n1,n2 w filename"意为将n1到n2的内容存储为filename这个文档，"!command"意味暂时离开vi编辑器并执行指令"command"并输出"command"执行后的信息，"set nu"意为显示行号，"set nonu"意为取消行号显示；v,V,ctrl+v,y(VISUAL 模式),d(VISUAL 模式)；":n"编辑下一个文档，":N"编辑上一个文档，":files"列出目前vim开启的文档；
+vim通过暂存档触发救援功能，当vim编辑器不正常关闭，再次使用vim打开相应文件时，按下R、D、O、E、Q、A（忽略）操作；vim相比与vi的最大进步是颜色显示功能，因此进行C语言或者shell script时能够有效进行debug；
+vim可以建立多窗口展示，在指令列模式下使用"sp filename"在同一个窗口下打开新文件，使用"ctrl+ww(双击)"切换窗口，也可以使用方向键代替第二个w；
+vim的所有操作都可以在~./viminfo找到，该档案也会记录你停留的最后操作，以便于下次打开可以方便的继续，"set all"用来查看当前预设的所有选项；
+vim常用环境设定"set nu","set noun","set hlsearch","set nohlsearch","set autoindent","set noautoindent","set backup","set ruler","set showmode","set all","set"；整体vim环境设定文件在/etc/vimrc(但你应该在 ~/.vimrc中修改它)；
+iconv --list -f -t -o(-o file)； 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

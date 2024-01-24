@@ -1,0 +1,19 @@
+/*
+ * @Author: pt13 
+ * @Date: 2024-01-22 20:26:17 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2024-01-23 01:12:40
+ */
+
+
+七、BASH
+用户控制SHELL、KDE、APPLICATION与KERNEL联系，KERNEL操控HARDWARE；
+bash的操作历史在.bash_history；
+键入指令alias lla='ls -la',因此lla='ls -la'就会生效；
+type可以观察非bash所提供的指令；
+type -t（file alias builtin）-p -a；
+"\"用于指令太长来进行多行输出；
+变量的取用与设定通过"echo"读取(echo $xxx)；临时变量通过"="进行连接；
+变量命名中"="两边不能直接接空格，开头字符不能是数字，用""或者''将含有空格的变量内容结合起来；可以使用"\"字符将特殊符号变成一般字；"version=$(uname -r)"，echo $version=执行uname -r后的结果；该变量如果需要在其他子程序执行，可通过"export"使其成为临时环境变量；通常情况下，系统使用大写字符作为变量，用户应该尽可能使用小写作为字符；取消变量的设定为"unset xx"(unset lla)；
+""与''最大不同在于""能够保留特殊字符的变量内容（$），''下变量将失去原有变量内容，显示为一般文字；
+p365

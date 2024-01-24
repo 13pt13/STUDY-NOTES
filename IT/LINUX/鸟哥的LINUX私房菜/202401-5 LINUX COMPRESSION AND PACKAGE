@@ -1,6 +1,43 @@
 /*
  * @Author: pt13 
  * @Date: 2024-01-19 02:08:55 
- * @Last Modified by:   pt13 
- * @Last Modified time: 2024-01-19 02:08:55 
+ * @Last Modified by: pt13
+ * @Last Modified time: 2024-01-21 01:28:30
  */
+
+
+五、LINUX档案压缩与备份
+1BYTES=8BITS，当记录的数字是1，1会在8BITS中占据最右边的1,左边7位由0填充，从而形成1BYTES，通过算法将这7个0的空间清理出来，就是文件压缩的原理，另一种压缩技术是当数据为"111..."时，算法会记录为N个1，因而不占用N个BITS，因此也能压缩容量；而由于被压缩过的数据无法被系统识别，因而要进行解压缩，这就是解压缩；
+常见的压缩技术与拓展名有*.Z(compress程序压缩)、*.gz(gzip程序压缩)、*.bz2(bzip2程序压缩)、*.tar(tar程序打包，并没有压缩)、*.tar.gz(经过tar打包与gzip压缩)、*.tar.bz2(经过tar打包与bzip压缩)；
+GNU计划将tar打包功能与bzip2压缩技术结合到一起，bzip2的压缩比更好；
+compress -c -r -v,uncompress,cat、zcat、bzcat（读纯文本压缩后的文件），compress一逐渐被淘汰；
+bzip2 -c -d -k -z -v -#；
+tar -c -t -x -j -z -v -f(-f filename) -C -p -P --exclude=FILE(不打包的FILE)，"tar -jcv -f filename.tar.bz2","tar -jtv -f filename.tar.bz2","tar -jxv -f filename.tar.bz2 -C(-C xx/xx/xx/)"；备份时一定要取消掉"/"根目录路径（-P 选项尽量不用），避免解压时自动解压到/etc覆盖原有文件； tarfile=tarball(打包文件)；"tar -jcv -f /backups/backup-system-2009.tar.bz2\ --exclude=/root/*.bz2 --exclude=/root/*.gz --exclude=/home/loop*\ /etc /home /var/spool/mail /var/spool/cron /root"； 
+dump -S -u -v -j -level -f(-f file) -W；restore -t -C -i -r -h -f -D；
+mkisofs -o -r -v -m(-m file) -V(-V vol) -graft-point；
+dd可以读取装置的内容（直接读取sector），将整个装置备份成为一个档案；
+dd if of bs count；dd可以将某个/dev/sda1完整复制到另一个partition上（读取并复制boot sector），使用cp与tar是做不到的，dd会连同SUPER BLOCK，BOOT SECTOR，META，DATA等数据都复制过来，因此新分割的PARTITION不需要格式化也能够使用dd将旧的PARTITION资料复制进去，亦即复制一个完全一样的磁盘出来；
+cpio -o -B -i -d -u -t -v -c,"-ovcB","-ivcdu","-ivct"；cpio是相当优秀的备份指令但必须配合其他程序如find查找文件路径使用；
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
