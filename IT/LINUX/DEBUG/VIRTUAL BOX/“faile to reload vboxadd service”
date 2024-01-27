@@ -1,3 +1,11 @@
+/*
+ * @Author: hejinjiang 
+ * @Date: 2024-01-28 01:40:38 
+ * @Last Modified by:   hejinjiang 
+ * @Last Modified time: 2024-01-28 01:40:38 
+ */
+
+
 1、打开机器，发现“faile to reload vboxadd.service”，无法启动MAHINE
 
 2、尝试DEBUG，
